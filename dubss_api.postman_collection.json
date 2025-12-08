@@ -1,0 +1,477 @@
+{
+  "info": {
+    "name": "DUBSS API - Sistema de Becas",
+    "description": "API REST completa para el sistema DUBSS de gestión de becas socioeconómicas",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Autenticación",
+      "item": [
+        {
+          "name": "Register (Crear cuenta estudiante)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombres\": \"Juan Carlos\",\n  \"apellidos\": \"Pérez López\",\n  \"email\": \"juan.perez@ejemplo.com\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\",\n  \"ci\": \"1234567\",\n  \"telefono\": \"77777777\",\n  \"ciudad\": \"La Paz\",\n  \"fecha_nacimiento\": \"2000-05-15\",\n  \"nro_registro\": \"2020-001234\",\n  \"carrera\": \"Ingeniería de Sistemas\",\n  \"semestre\": 5\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    console.log('Token guardado:', jsonData.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"estudiante@test.com\",\n  \"password\": \"password\",\n  \"revoke_previous_tokens\": false\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Me (Usuario actual)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Becas",
+      "item": [
+        {
+          "name": "Listar becas disponibles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/becas",
+              "host": ["{{base_url}}"],
+              "path": ["becas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ver detalle de beca",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/becas/1",
+              "host": ["{{base_url}}"],
+              "path": ["becas", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Convocatorias",
+      "item": [
+        {
+          "name": "Listar convocatorias activas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/convocatorias",
+              "host": ["{{base_url}}"],
+              "path": ["convocatorias"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ver detalle de convocatoria",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/convocatorias/1",
+              "host": ["{{base_url}}"],
+              "path": ["convocatorias", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Formulario Socioeconómico",
+      "item": [
+        {
+          "name": "Ver mi formulario",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/formularios/mi-formulario",
+              "host": ["{{base_url}}"],
+              "path": ["formularios", "mi-formulario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Guardar formulario (completo)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/formularios",
+              "host": ["{{base_url}}"],
+              "path": ["formularios"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado_civil\": \"SOLTERO\",\n  \"tiene_hijos\": false,\n  \"cantidad_hijos\": 0,\n  \"personas_a_cargo\": 2,\n  \"recibe_bono\": true,\n  \"tipo_bono\": \"Bono Juancito Pinto\",\n  \"certificado_discapacidad\": false,\n  \"observaciones\": \"Sin observaciones\",\n  \"completado\": true,\n  \"grupo_familiar\": {\n    \"cantidad_familiares\": 4,\n    \"cantidad_hijos\": 0,\n    \"miembros\": [\n      {\n        \"nombre\": \"María\",\n        \"apellido\": \"López\",\n        \"parentesco\": \"Madre\",\n        \"edad\": 45,\n        \"ocupacion\": \"Comerciante\"\n      },\n      {\n        \"nombre\": \"José\",\n        \"apellido\": \"Pérez\",\n        \"parentesco\": \"Padre\",\n        \"edad\": 48,\n        \"ocupacion\": \"Albañil\"\n      }\n    ]\n  },\n  \"dependencia_economica\": {\n    \"tipo_dependencia\": \"DEPENDIENTE\",\n    \"ingresos\": [\n      {\n        \"fuente_ingreso\": \"Trabajo padre\",\n        \"monto_mensual\": 1500\n      },\n      {\n        \"fuente_ingreso\": \"Comercio madre\",\n        \"monto_mensual\": 800\n      }\n    ]\n  },\n  \"residencia\": {\n    \"zona\": \"Villa Fátima\",\n    \"direccion\": \"Calle 10 #234\",\n    \"tipo_vivienda\": \"Casa\",\n    \"material_construccion\": \"Ladrillo\",\n    \"cant_dormitorios\": 3,\n    \"cant_banhos\": 1,\n    \"tiene_agua_potable\": true,\n    \"tiene_luz_electrica\": true,\n    \"tiene_alcantarillado\": true,\n    \"tiene_internet\": false\n  },\n  \"tenencia_vivienda\": {\n    \"tipo_tenencia\": \"PROPIA\"\n  }\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Postulaciones",
+      "item": [
+        {
+          "name": "Mis postulaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/postulaciones",
+              "host": ["{{base_url}}"],
+              "path": ["postulaciones"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ver detalle de postulación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/postulaciones/1",
+              "host": ["{{base_url}}"],
+              "path": ["postulaciones", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear postulación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/postulaciones",
+              "host": ["{{base_url}}"],
+              "path": ["postulaciones"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_beca\": 1\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Trámites",
+      "item": [
+        {
+          "name": "Mi trámite",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tramites/mi-tramite",
+              "host": ["{{base_url}}"],
+              "path": ["tramites", "mi-tramite"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar trámite por código",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/tramites/TRM-ABC123XY",
+              "host": ["{{base_url}}"],
+              "path": ["tramites", "TRM-ABC123XY"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Notificaciones",
+      "item": [
+        {
+          "name": "Mis notificaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notificaciones?solo_no_leidas=false&limit=20",
+              "host": ["{{base_url}}"],
+              "path": ["notificaciones"],
+              "query": [
+                {
+                  "key": "solo_no_leidas",
+                  "value": "false"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Estadísticas de notificaciones",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notificaciones/estadisticas",
+              "host": ["{{base_url}}"],
+              "path": ["notificaciones", "estadisticas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar notificación como leída",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notificaciones/1/leer",
+              "host": ["{{base_url}}"],
+              "path": ["notificaciones", "1", "leer"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Marcar todas como leídas",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notificaciones/leer-todas",
+              "host": ["{{base_url}}"],
+              "path": ["notificaciones", "leer-todas"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar notificación",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/notificaciones/1",
+              "host": ["{{base_url}}"],
+              "path": ["notificaciones", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
