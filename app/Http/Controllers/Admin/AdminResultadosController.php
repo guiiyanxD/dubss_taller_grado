@@ -21,7 +21,7 @@ class AdminResultadosController extends Controller
     ) {
         $this->resultadosService = $resultadosService;
         $this->exportService = $exportService;
-        $this->middleware(['auth', 'role:Dpto. Sistema|Dirección']);
+        //$this->middleware(['auth', 'role:Dpto. Sistema|Dirección']);
     }
 
     /**
@@ -33,7 +33,7 @@ class AdminResultadosController extends Controller
     {
         $convocatoriaId = $request->input('convocatoria_id');
 
-        $estadisticas = $this->resultadosService->obtenerEstadisticasGenerales($convocatoriaId);
+        $estadisticas = $this->resultadosService->obtenerEstadisticasDashboard($convocatoriaId);
         $convocatorias = $this->resultadosService->obtenerConvocatoriasDisponibles();
 
         return Inertia::render('Admin/Resultados/Dashboard', [

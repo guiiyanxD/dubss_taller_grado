@@ -64,6 +64,35 @@ const aprobarTramite = () => {
         }
     );
 };
+const aprobar = () => {
+    router.put(
+        route('operador.tramites.validar.submit', props.tramite.id),
+        {
+            accion: 'APROBAR',
+            documentos_validados: documentos.value
+                .filter(d => d.validado === true)
+                .map(d => ({ tipo: d.tipo, valido: true })),
+            observaciones: 'Documentos correctos',
+        },
+        {
+            preserveState: false,
+            preserveScroll: false,
+            onSuccess: () => {
+                // Forzar navegación completa al dashboard
+                router.visit(route('operador.dashboard'), {
+                    method: 'get',
+                    preserveState: false,
+                });
+            },
+            onError: (errors) => {
+                console.error('Error al validar:', errors);
+            },
+            onFinish: () => {
+                procesando.value = false;
+            }
+        }
+    );
+};
 
 const rechazarTramite = () => {
     if (!puedeRechazar.value) return;
@@ -140,7 +169,7 @@ const getEstadoColor = (estado) => {
                             <div class="space-y-3">
                                 <div>
                                     <label class="text-xs font-bold text-slate-600 uppercase">Nombre</label>
-                                    <p class="text-slate-900 font-semibold">{{ tramite.estudiante.nombre }}</p>
+                                    <p class="text-slate-900 font-semibold">{{ tramite.estudiante.nombres }}</p>
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-slate-600 uppercase">CI</label>
@@ -282,7 +311,7 @@ const getEstadoColor = (estado) => {
                         <!-- Botones de acción -->
                         <div class="flex gap-4">
                             <button
-                                @click="aprobarTramite"
+                                @click="aprobar"
                                 :disabled="!puedeAprobar || procesando"
                                 class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 px-6 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 active:scale-95 shadow-lg"
                             >

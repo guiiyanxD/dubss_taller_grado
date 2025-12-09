@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Operador\ValidarTramiteRequest;
 use App\Services\TramiteOperadorService;
 use Illuminate\Http\Request;
+use App\Models\Tramite;
 use Inertia\Inertia;
 use Inertia\Response;
+//use Illuminate\Http\Response;
 
 class TramiteOperadorController extends Controller
 {
@@ -92,12 +94,13 @@ class TramiteOperadorController extends Controller
      */
     public function mostrarValidacion(int $id): Response
     {
-        $tramite = $this->tramiteService->obtenerParaValidacion($id);
-
-        if (!$tramite) {
-            return redirect()->route('operador.dashboard')
-                ->with('error', 'Trámite no encontrado');
-        }
+        $tramite = Tramite::with([
+            'postulacion.estudiante',
+            'postulacion.beca',
+            'estadoActual',
+            'documentos',
+            'historial.revisador',
+        ])->findOrFail($id);
 
         return Inertia::render('Operador/ValidarTramite', [
             'tramite' => $tramite,
@@ -109,27 +112,36 @@ class TramiteOperadorController extends Controller
      *
      * PUT /operador/tramites/{id}/validar
      */
-    public function validar(ValidarTramiteRequest $request, int $id)
+    public function validar(ValidarTramiteRequest $request, int $id): Response
     {
         try {
             $resultado = $this->tramiteService->validarTramite(
-                $id,
-                $request->accion,
-                $request->documentos_validados ?? [],
-                $request->observaciones,
-                auth()->id()
+                tramiteId: $id,
+                accion: $request->input('accion'),
+                documentosValidados: $request->input('documentos_validados', []),
+                observaciones: $request->input('observaciones'),
+                operadorId: auth()->id()
             );
 
-            // Obtener estadísticas para el dashboard
-            $estadisticas = $this->tramiteService->obtenerEstadisticasOperador(auth()->id());
+            // Opción A: Usar Inertia::location() para redirect externo
+            return Inertia::location(route('operador.dashboard'));
 
-            // Retornar directamente la página del dashboard con mensaje flash
-            return Inertia::render('Operador/Dashboard', [
-                'estadisticas' => $estadisticas,
-            ])->with('success', $resultado['message']);
+            // O Opción B: Renderizar directamente la vista con datos actualizados
+            // $estadisticas = $this->tramiteService->obtenerEstadisticasOperador(auth()->id());
+            // return Inertia::render('Operador/Dashboard', [
+            //     'estadisticas' => $estadisticas,
+            // ])->with('success', $resultado['message']);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al validar trámite: ' . $e->getMessage());
+            return Inertia::render('Operador/ValidarTramite', [
+                'tramite' => Tramite::with([
+                    'postulacion.estudiante',
+                    'postulacion.beca',
+                    'estadoActual',
+                    'documentos',
+                ])->findOrFail($id),
+                'error' => 'Error al validar trámite: ' . $e->getMessage(),
+            ]);
         }
     }
 

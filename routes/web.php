@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Operador\TramiteOperadorController;
 use App\Http\Controllers\Operador\DocumentoOperadorController;
 use App\Http\Controllers\Admin\AdminResultadosController;
+use App\Http\Controllers\DashboardController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -17,9 +18,11 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -54,17 +57,17 @@ Route::middleware(['auth', 'verified'])->prefix('operador')->name('operador.')->
     Route::get('/tramites/pendientes', [TramiteOperadorController::class, 'pendientes'])
         ->name('tramites.pendientes');
 
-    // Validación de trámites
+
     Route::get('/tramites/{id}/validar', [TramiteOperadorController::class, 'mostrarValidacion'])
         ->name('tramites.validar');
     Route::put('/tramites/{id}/validar', [TramiteOperadorController::class, 'validar'])
         ->name('tramites.validar.submit');
 
-    // Trámites validados (listos para digitalizar)
+
     Route::get('/tramites/validados', [TramiteOperadorController::class, 'validados'])
         ->name('tramites.validados');
 
-    // Digitalización
+
     Route::get('/tramites/{id}/digitalizar', [DocumentoOperadorController::class, 'mostrarDigitalizacion'])
         ->name('tramites.digitalizar');
     Route::post('/documentos/upload', [DocumentoOperadorController::class, 'upload'])
@@ -93,7 +96,7 @@ Route::middleware(['auth', 'verified'])->prefix('operador')->name('operador.')->
         ->name('tramites.detalle');
 });
 
-// Rutas para Administración (Dpto. Sistema y Dirección)
+
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard de resultados
@@ -128,3 +131,30 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     Route::get('/resultados/estadisticas-filtradas', [AdminResultadosController::class, 'estadisticasFiltradas'])
         ->name('resultados.estadisticas-filtradas');
 });
+
+Route::middleware(['auth', 'verified'])->prefix('admin/reportes')->name('admin.reportes.')->group(function () {
+
+
+    Route::get('/', [AdminReportesController::class, 'index'])
+        ->name('index');
+
+
+    Route::post('/ranking/excel', [AdminReportesController::class, 'exportarRankingExcel'])
+        ->name('ranking.excel');
+
+
+    Route::post('/ranking/pdf', [AdminReportesController::class, 'exportarRankingPDF'])
+        ->name('ranking.pdf');
+
+
+    Route::post('/estadisticas/excel', [AdminReportesController::class, 'exportarEstadisticasExcel'])
+        ->name('estadisticas.excel');
+
+
+    Route::post('/nomina/excel', [AdminReportesController::class, 'exportarNominaAprobados'])
+        ->name('nomina.excel');
+
+
+    Route::post('/limpiar', [AdminReportesController::class, 'limpiarArchivosAntiguos'])
+        ->name('limpiar');
+})->middleware(['auth', 'role:Dpto. Sistema|Dirección']);
