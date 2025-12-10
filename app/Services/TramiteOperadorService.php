@@ -116,7 +116,7 @@ class TramiteOperadorService
         try {
             $tramite = Tramite::findOrFail($tramiteId);
             $estadoAnterior = $tramite->estadoActual->nombre ?? 'EN_VALIDACION';
-
+            //return dd($estadoAnterior);
             if ($accion === 'APROBAR') {
                 $nuevoEstado = EstadoTramite::where('nombre', 'VALIDADO')->first();
                 $mensaje = 'Documentación aprobada correctamente';
@@ -135,7 +135,7 @@ class TramiteOperadorService
             $tramite->update([
                 'estado_actual' => $nuevoEstado->id,
             ]);
-
+            return dd($tramite);
             // Registrar en historial
             $tramite->historial()->create([
                 'estado_anterior' => $estadoAnterior,

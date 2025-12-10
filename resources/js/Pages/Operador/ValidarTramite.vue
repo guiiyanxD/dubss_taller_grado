@@ -169,7 +169,7 @@ const getEstadoColor = (estado) => {
                             <div class="space-y-3">
                                 <div>
                                     <label class="text-xs font-bold text-slate-600 uppercase">Nombre</label>
-                                    <p class="text-slate-900 font-semibold">{{ tramite.estudiante.nombres }}</p>
+                                    <p class="text-slate-900 font-semibold">{{ tramite.estudiante.nombre }}</p>
                                 </div>
                                 <div>
                                     <label class="text-xs font-bold text-slate-600 uppercase">CI</label>

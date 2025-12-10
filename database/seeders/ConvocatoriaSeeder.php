@@ -17,29 +17,28 @@ class ConvocatoriaSeeder extends Seeder
         Convocatoria::create([
             'nombre' => 'Convocatoria Becas Socioeconómicas 2024-I',
             'descripcion' => 'Primera convocatoria de becas socioeconómicas del año 2024 para estudiantes de pregrado',
+            'estado' => 'ACTIVA',
             'fecha_inicio' => Carbon::now()->subDays(15),
             'fecha_fin' => Carbon::now()->addDays(15),
         ]);
 
-        // Convocatoria Futura
+
         Convocatoria::create([
             'nombre' => 'Convocatoria Becas Socioeconómicas 2024-II',
             'descripcion' => 'Segunda convocatoria de becas socioeconómicas del año 2024',
-            'fecha_inicio' => Carbon::now()->addMonths(3),
-            'fecha_fin' => Carbon::now()->addMonths(4),
+            'estado' => 'ACTIVA',
+            'fecha_inicio' => Carbon::now()->subDays(3),
+            'fecha_fin' => Carbon::now()->addMonths(1),
         ]);
 
-        // Convocatoria Pasada (Cerrada)
+        // Convocatoria Pasada (FINALIZADA)
         Convocatoria::create([
             'nombre' => 'Convocatoria Becas Socioeconómicas 2023-II',
             'descripcion' => 'Segunda convocatoria de becas socioeconómicas del año 2023',
+            'estado' => 'FINALIZADA',
             'fecha_inicio' => Carbon::now()->subMonths(6),
             'fecha_fin' => Carbon::now()->subMonths(5),
         ]);
 
-        $this->command->info('✅ Convocatorias creadas: 3');
-        $this->command->info('   - 1 Activa (en curso)');
-        $this->command->info('   - 1 Futura');
-        $this->command->info('   - 1 Cerrada');
     }
 }

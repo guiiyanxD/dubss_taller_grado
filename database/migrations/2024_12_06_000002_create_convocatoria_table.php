@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre', 100);
             $table->string('descripcion', 255);
+            $table->string('estado', 100)->default("ACTIVA"); //TODO: AGREGAR AL DIAGRAMA
             $table->date('fecha_inicio');
             $table->date('fecha_fin');
             $table->timestamps();

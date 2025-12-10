@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Operador\TramiteOperadorController;
 use App\Http\Controllers\Operador\DocumentoOperadorController;
 use App\Http\Controllers\Admin\AdminResultadosController;
+use App\Http\Controllers\Admin\BecaController;
+use App\Http\Controllers\Admin\RequisitoController;
+use App\Http\Controllers\Admin\ConvocatoriaController;
 use App\Http\Controllers\DashboardController;
 use Inertia\Inertia;
 
@@ -158,3 +161,75 @@ Route::middleware(['auth', 'verified'])->prefix('admin/reportes')->name('admin.r
     Route::post('/limpiar', [AdminReportesController::class, 'limpiarArchivosAntiguos'])
         ->name('limpiar');
 })->middleware(['auth', 'role:Dpto. Sistema|Dirección']);
+
+
+Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+
+    // ================================================
+    // CONVOCATORIAS
+    // ================================================
+    Route::prefix('convocatorias')->name('convocatorias.')->group(function () {
+        // Listado y búsqueda
+        Route::get('/', [ConvocatoriaController::class, 'index'])->name('index');
+
+        // Crear
+        Route::get('/crear', [ConvocatoriaController::class, 'create'])->name('create');
+        Route::post('/', [ConvocatoriaController::class, 'store'])->name('store');
+
+        // Ver
+        Route::get('/{id}', [ConvocatoriaController::class, 'show'])->name('show');
+
+        // Editar
+        Route::get('/{id}/editar', [ConvocatoriaController::class, 'edit'])->name('edit');
+        Route::match(['put', 'post'], '/{id}', [ConvocatoriaController::class, 'update'])->name('update');
+
+        // Eliminar
+        Route::delete('/{id}', [ConvocatoriaController::class, 'destroy'])->name('destroy');
+
+        // Acciones especiales
+        Route::post('/{id}/activar', [ConvocatoriaController::class, 'activar'])->name('activar');
+        Route::post('/{id}/finalizar', [ConvocatoriaController::class, 'finalizar'])->name('finalizar');
+    });
+
+    // ================================================
+    // BECAS
+    // ================================================
+    Route::prefix('becas')->name('becas.')->group(function () {
+        // Listado y búsqueda
+        Route::get('/', [BecaController::class, 'index'])->name('index');
+
+        // Crear
+        Route::get('/crear', [BecaController::class, 'create'])->name('create');
+        Route::post('/', [BecaController::class, 'store'])->name('store');
+
+        // Ver
+        Route::get('/{id}', [BecaController::class, 'show'])->name('show');
+
+        // Editar
+        Route::get('/{id}/editar', [BecaController::class, 'edit'])->name('edit');
+        Route::match(['put', 'post'], '/{id}', [BecaController::class, 'update'])->name('update');
+
+        // Eliminar
+        Route::delete('/{id}', [BecaController::class, 'destroy'])->name('destroy');
+    });
+
+
+    Route::prefix('requisitos')->name('requisitos.')->group(function () {
+        // Listado y búsqueda
+        Route::get('/', [RequisitoController::class, 'index'])->name('index');
+
+        // Crear
+        Route::get('/crear', [RequisitoController::class, 'create'])->name('create');
+        Route::post('/', [RequisitoController::class, 'store'])->name('store');
+
+        // Ver
+        Route::get('/{id}', [RequisitoController::class, 'show'])->name('show');
+
+        // Editar
+        Route::get('/{id}/editar', [RequisitoController::class, 'edit'])->name('edit');
+        Route::match(['put', 'post'], '/{id}', [RequisitoController::class, 'update'])->name('update');
+
+        // Eliminar
+        Route::delete('/{id}', [RequisitoController::class, 'destroy'])->name('destroy');
+    });
+});

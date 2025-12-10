@@ -18,7 +18,7 @@ class BecaSeeder extends Seeder
         $convocatoriaActiva = Convocatoria::where('fecha_fin', '>', now())->first();
 
         if (!$convocatoriaActiva) {
-            $this->command->warn('⚠️  No hay convocatoria activa. Usando la primera convocatoria.');
+            $this->command->warn('No hay convocatoria activa. Usando la primera convocatoria.');
             $convocatoriaActiva = Convocatoria::first();
         }
 
@@ -84,7 +84,5 @@ class BecaSeeder extends Seeder
             $beca->requisitos()->attach($requisitosIds);
         }
 
-        $this->command->info('✅ Becas creadas: ' . count($becas));
-        $this->command->info('   Total de cupos disponibles: ' . array_sum(array_column($becas, 'cupos_disponibles')));
     }
 }
