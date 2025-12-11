@@ -77,13 +77,10 @@ class TramiteOperadorController extends Controller
      */
     public function pendientes(Request $request): Response
     {
-        $tramites = $this->tramiteService->obtenerTramitesPendientes(
-            $request->input('page', 1),
-            $request->input('per_page', 15)
-        );
+        $tramites = $this->tramiteService->obtenerTramitesPendientes();
 
         return Inertia::render('Operador/TramitesPendientes', [
-            'tramites' => $tramites,
+            'tramites' => $tramites, // Ahora es un array directo, no un objeto paginado
         ]);
     }
 
@@ -94,16 +91,10 @@ class TramiteOperadorController extends Controller
      */
     public function mostrarValidacion(int $id): Response
     {
-        $tramite = Tramite::with([
-            'postulacion.estudiante',
-            'postulacion.beca',
-            'estadoActual',
-            'documentos',
-            'historial.revisador',
-        ])->findOrFail($id);
+        $tramiteDatos = $this->tramiteService->obtenerParaValidacion($id);
 
         return Inertia::render('Operador/ValidarTramite', [
-            'tramite' => $tramite,
+            'tramite' => $tramiteDatos,
         ]);
     }
 

@@ -54,51 +54,53 @@ class TramiteOperadorService
     /**
      * Obtener trámites pendientes de validación
      */
-    public function obtenerTramitesPendientes(int $page = 1, int $perPage = 15): array
+    public function obtenerTramitesPendientes(): array
     {
-        $estadoPendiente = EstadoTramite::where('nombre', 'PENDIENTE')->first();
-        $estadoEnValidacion = EstadoTramite::where('nombre', 'EN_VALIDACION')->first();
+        $estadoPendiente = 1; //EstadoTramite::where('nombre', 'PENDIENTE')->first();
+        $estadoEnValidacion = 2 ; //EstadoTramite::where('nombre', 'EN_VALIDACION')->first();
 
-        $tramites = Tramite::with([
-            'postulacion.estudiante.usuario',
-            'postulacion.beca',
-            'estadoActual',
+        $tramites = Tramite::select([
+            'id',
+            'id_postulacion',
+            'estado_actual',
+            'created_at'
+        ])->with([
+            'postulacion:id,id_estudiante,id_beca', // Solo IDs
+            'postulacion.estudiante.usuario:id,ci,nombres,email', // Solo necesarios
+            'postulacion.beca:id,nombre',
+            'estadoActual:id,nombre',
         ])
-            ->whereIn('estado_actual', [$estadoPendiente->id, $estadoEnValidacion->id])
+            ->whereIn('estado_actual', [$estadoPendiente, $estadoEnValidacion])
             ->orderBy('created_at', 'asc')
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->get(); // CAMBIO CRÍTICO: Usamos get() en lugar de paginate()
 
-        return [
-            'data' => $tramites->items(),
-            'current_page' => $tramites->currentPage(),
-            'last_page' => $tramites->lastPage(),
-            'per_page' => $tramites->perPage(),
-            'total' => $tramites->total(),
-        ];
+        // CAMBIO CRÍTICO: Devolvemos el array de modelos mapeados directamente
+        return $tramites->toArray();
     }
 
     /**
-     * Obtener un trámite para validación
+     * Obtener el detalle de un trámite específico con datos limitados para su validación.
      */
-    public function obtenerParaValidacion(int $tramiteId): ?array
+    public function obtenerParaValidacion(int $id): array
     {
-        $tramite = Tramite::with([
-            'postulacion.estudiante.usuario',
-            'postulacion.beca.requisitos',
-            'postulacion.convocatoria',
-            'postulacion.formulario.grupoFamiliar.miembrosFamiliares',
-            'postulacion.formulario.dependenciaEconomica.ingresosEconomicos',
-            'postulacion.formulario.residencia',
-            'postulacion.formulario.tenenciaVivienda',
-            'estadoActual',
-            'documentos',
-        ])->find($tramiteId);
+        $tramite = Tramite::select([
+            'id', 'codigo', 'estado_actual', 'created_at', 'id_postulacion',
+            'fecha_creacion', 'clasificado', 'fecha_clasificacion' // Campos base del trámite
+        ])->with([
+            'postulacion:id,id_estudiante,id_beca',
+            'postulacion.estudiante:id_usuario,carrera,semestre',
+            'postulacion.estudiante.usuario:id,nombres,ci,email',
+            'postulacion.beca:id,nombre,id_convocatoria',
+            'postulacion.beca.convocatoria:id,nombre',
+            'estadoActual:id,nombre',
+            'documentos:id,id_tramite,nombre_archivo,ruta_digital,estado_fisico',
+            'historial:id,id_tramite,estado_anterior,estado_nuevo,observaciones,revisador_por,fecha_revision',
+            'historial.revisador:id,nombres,apellidos',
 
-        if (!$tramite) {
-            return null;
-        }
+        ])->findOrFail($id);
 
-        return $this->formatearTramiteCompleto($tramite);
+        // Mapeo (o usar TramiteResource aquí si existiera)
+        return $tramite->toArray();
     }
 
     /**

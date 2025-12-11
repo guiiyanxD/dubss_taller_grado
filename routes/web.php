@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\BecaController;
 use App\Http\Controllers\Admin\RequisitoController;
 use App\Http\Controllers\Admin\ConvocatoriaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FormularioSocioEconomicoController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -24,8 +25,25 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('dashboard');
+});
+Route::get('/convocatorias/{id}/becas', [ConvocatoriaController::class, 'getBecas'])->name('admin.convocatorias.becas');
+
+
+
+Route::get('/formularios/crear', [FormularioSocioEconomicoController::class, 'create'])->name('formularios.create');
+
+Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+
+    Route::controller(FormularioSocioEconomicoController::class)->group(function () {
+
+        Route::post('/formularios', 'store')->name('formularios.store');
+        Route::get('/formularios', 'index')->name('formularios.index');
+    });
 
 });
+
+
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -41,6 +59,7 @@ require __DIR__.'/auth.php';
 | Rutas del Panel Web Operativo
 |--------------------------------------------------------------------------
 */
+
 
 // Rutas para Operadores
 Route::middleware(['auth', 'verified'])->prefix('operador')->name('operador.')->group(function () {
@@ -63,6 +82,7 @@ Route::middleware(['auth', 'verified'])->prefix('operador')->name('operador.')->
 
     Route::get('/tramites/{id}/validar', [TramiteOperadorController::class, 'mostrarValidacion'])
         ->name('tramites.validar');
+
     Route::put('/tramites/{id}/validar', [TramiteOperadorController::class, 'validar'])
         ->name('tramites.validar.submit');
 
@@ -133,41 +153,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
     // Estadísticas filtradas (AJAX)
     Route::get('/resultados/estadisticas-filtradas', [AdminResultadosController::class, 'estadisticasFiltradas'])
         ->name('resultados.estadisticas-filtradas');
-});
 
-Route::middleware(['auth', 'verified'])->prefix('admin/reportes')->name('admin.reportes.')->group(function () {
-
-
-    Route::get('/', [AdminReportesController::class, 'index'])
-        ->name('index');
-
-
-    Route::post('/ranking/excel', [AdminReportesController::class, 'exportarRankingExcel'])
-        ->name('ranking.excel');
-
-
-    Route::post('/ranking/pdf', [AdminReportesController::class, 'exportarRankingPDF'])
-        ->name('ranking.pdf');
-
-
-    Route::post('/estadisticas/excel', [AdminReportesController::class, 'exportarEstadisticasExcel'])
-        ->name('estadisticas.excel');
-
-
-    Route::post('/nomina/excel', [AdminReportesController::class, 'exportarNominaAprobados'])
-        ->name('nomina.excel');
-
-
-    Route::post('/limpiar', [AdminReportesController::class, 'limpiarArchivosAntiguos'])
-        ->name('limpiar');
-})->middleware(['auth', 'role:Dpto. Sistema|Dirección']);
-
-
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
-
-    // ================================================
-    // CONVOCATORIAS
-    // ================================================
     Route::prefix('convocatorias')->name('convocatorias.')->group(function () {
         // Listado y búsqueda
         Route::get('/', [ConvocatoriaController::class, 'index'])->name('index');
@@ -191,9 +177,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::post('/{id}/finalizar', [ConvocatoriaController::class, 'finalizar'])->name('finalizar');
     });
 
-    // ================================================
-    // BECAS
-    // ================================================
+
     Route::prefix('becas')->name('becas.')->group(function () {
         // Listado y búsqueda
         Route::get('/', [BecaController::class, 'index'])->name('index');
@@ -233,3 +217,32 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::delete('/{id}', [RequisitoController::class, 'destroy'])->name('destroy');
     });
 });
+
+Route::middleware(['auth', 'verified'])->prefix('admin/reportes')->name('admin.reportes.')->group(function () {
+
+
+    Route::get('/', [AdminReportesController::class, 'index'])
+        ->name('index');
+
+
+    Route::post('/ranking/excel', [AdminReportesController::class, 'exportarRankingExcel'])
+        ->name('ranking.excel');
+
+
+    Route::post('/ranking/pdf', [AdminReportesController::class, 'exportarRankingPDF'])
+        ->name('ranking.pdf');
+
+
+    Route::post('/estadisticas/excel', [AdminReportesController::class, 'exportarEstadisticasExcel'])
+        ->name('estadisticas.excel');
+
+
+    Route::post('/nomina/excel', [AdminReportesController::class, 'exportarNominaAprobados'])
+        ->name('nomina.excel');
+
+
+    Route::post('/limpiar', [AdminReportesController::class, 'limpiarArchivosAntiguos'])
+        ->name('limpiar');
+})->middleware(['auth', 'role:Dpto. Sistema|Dirección']);
+
+

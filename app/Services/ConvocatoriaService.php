@@ -14,38 +14,53 @@ use Illuminate\Pagination\LengthAwarePaginator;
  */
 class ConvocatoriaService
 {
+
+    /**
+     * Obtiene la lista de becas disponibles para una convocatoria específica.
+     * @param int $convocatoriaId
+     * @return Collection
+     */
+    public function getBecasByConvocatoria(int $convocatoriaId): Collection
+    {
+        $convocatoria = Convocatoria::with('becas:id,nombre')->find($convocatoriaId);
+
+        if (!$convocatoria) {
+            return collect();
+        }
+
+        return $convocatoria->becas->map(function ($beca) {
+            return [
+                'id' => $beca->id,
+                'nombre' => $beca->nombre,
+            ];
+        });
+    }
+
     /**
      * Obtener convocatorias paginadas con filtros
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    // CAMBIO 1: Agregamos $perPage y cambiamos el tipo de retorno
     public function listar(array $filtros = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = Convocatoria::query()
-            // CAMBIO 2: Usamos withCount para contar becas y postulaciones en la DB
             ->withCount(['becas', 'postulaciones']);
 
-        // Filtro por estado
         if (isset($filtros['estado']) && $filtros['estado'] !== '') {
             $query->where('estado', $filtros['estado']);
         }
 
-        // Filtro por año
         if (isset($filtros['anio'])) {
             $query->whereYear('fecha_inicio', $filtros['anio']);
         }
 
-        // Búsqueda por nombre
         if (isset($filtros['busqueda'])) {
             // Se usa 'nombre' ILIKE (para PostgreSQL) o LIKE (en MySQL/MariaDB)
             $query->where('nombre', 'ILIKE', '%' . $filtros['busqueda'] . '%');
         }
 
-        // CAMBIO 3: Aplicamos paginación en lugar de ->get()
         $paginator = $query->orderBy('fecha_inicio', 'desc')->paginate($perPage);
 
-        // CAMBIO 4: Usamos ->through() para mapear SOLO los datos de la página actual
         return $paginator->through(function ($convocatoria) {
             return [
                 'id' => $convocatoria->id,
@@ -138,12 +153,10 @@ class ConvocatoriaService
         try {
             $convocatoria = Convocatoria::findOrFail($id);
 
-            // No permitir editar si está FINALIZADA
             if ($convocatoria->estado === 'FINALIZADA') {
                 throw new \Exception('No se puede editar una convocatoria finalizada');
             }
 
-            // Validar fechas si cambiaron
             if (isset($datos['fecha_inicio']) || isset($datos['fecha_fin'])) {
                 $fechaInicio = $datos['fecha_inicio'] ?? $convocatoria->fecha_inicio->format('Y-m-d');
                 $fechaFin = $datos['fecha_fin'] ?? $convocatoria->fecha_fin->format('Y-m-d');
@@ -178,12 +191,10 @@ class ConvocatoriaService
         try {
             $convocatoria = Convocatoria::findOrFail($id);
 
-            // No permitir eliminar si tiene postulaciones
             if ($convocatoria->postulaciones()->count() > 0) {
                 throw new \Exception('No se puede eliminar una convocatoria con postulaciones');
             }
 
-            // No permitir eliminar si está activa
             if ($convocatoria->estado === 'ACTIVA') {
                 throw new \Exception('No se puede eliminar una convocatoria activa');
             }
@@ -215,12 +226,10 @@ class ConvocatoriaService
         try {
             $convocatoria = Convocatoria::findOrFail($id);
 
-            // Validar que tenga al menos una beca
             if ($convocatoria->becas()->count() === 0) {
                 throw new \Exception('La convocatoria debe tener al menos una beca para activarse');
             }
 
-            // Desactivar otras convocatorias activas
             Convocatoria::where('estado', 'ACTIVA')
                 ->where('id', '!=', $id)
                 ->update(['estado' => 'FINALIZADA']);
@@ -274,12 +283,10 @@ class ConvocatoriaService
      */
     private function validarFechas(string $fechaInicio, string $fechaFin, ?int $convocatoriaId = null): void
     {
-        // Validar que fecha_fin > fecha_inicio
         if ($fechaFin <= $fechaInicio) {
             throw new \Exception('La fecha de fin debe ser posterior a la fecha de inicio');
         }
 
-        // Verificar solapamiento con otras convocatorias activas
         $query = Convocatoria::where('estado', 'ACTIVA')
             ->where(function ($q) use ($fechaInicio, $fechaFin) {
                 $q->whereBetween('fecha_inicio', [$fechaInicio, $fechaFin])

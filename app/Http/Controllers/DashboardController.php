@@ -14,30 +14,10 @@ class DashboardController extends Controller
      *
      * GET /dashboard
      */
-    public function index(Request $request): Response
+    public function index(): Response
     {
-        $user = $request->user();
-
-        // Obtener estadísticas según el rol
-        $estadisticas = $this->getEstadisticasPorRol($user);
-
-        // Obtener acciones rápidas según el rol
-        $accionesRapidas = $this->getAccionesRapidasPorRol($user);
-
-        // Obtener actividad reciente según el rol
-        $actividadReciente = $this->getActividadRecientePorRol($user);
-
-        return Inertia::render('Dashboard/Index', [
-            'usuario' => [
-                'id' => $user->id,
-                'nombre' => $user->nombre_completo,
-                'rol' => $user->rol,
-                'email' => $user->email,
-            ],
-            'estadisticas' => $estadisticas,
-            'acciones_rapidas' => $accionesRapidas,
-            'actividad_reciente' => $actividadReciente,
-        ]);
+        //return dd(auth()->user());
+        return Inertia::render('Dashboard/Index');
     }
 
     /**
