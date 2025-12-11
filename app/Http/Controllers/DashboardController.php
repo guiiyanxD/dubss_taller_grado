@@ -83,7 +83,6 @@ class DashboardController extends Controller
                         'habilitado' => true,
                     ],
                 ];
-
             case 'Operador':
                 return [
                     [
@@ -173,6 +172,155 @@ class DashboardController extends Controller
                     ],
                 ];
 
+            case 'Super Admin':
+                return [
+                    [
+                        'titulo' => 'Postular a Beca',
+                        'descripcion' => 'Completa tu formulario socioeconómico y postula',
+                        'icono' => 'DocumentTextIcon',
+                        'color' => 'blue',
+                        'ruta' => route('estudiante.postular'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Mis Postulaciones',
+                        'descripcion' => 'Ver estado de mis postulaciones',
+                        'icono' => 'ClipboardDocumentListIcon',
+                        'color' => 'green',
+                        'ruta' => route('estudiante.postulaciones'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Notificaciones',
+                        'descripcion' => 'Ver mis notificaciones y mensajes',
+                        'icono' => 'BellIcon',
+                        'color' => 'yellow',
+                        'ruta' => route('estudiante.notificaciones'),
+                        'habilitado' => true,
+                        'badge' => $this->getNotificacionesNoLeidas($user),
+                    ],
+                    [
+                        'titulo' => 'Mi Perfil',
+                        'descripcion' => 'Actualizar mis datos personales',
+                        'icono' => 'UserCircleIcon',
+                        'color' => 'purple',
+                        'ruta' => route('estudiante.perfil'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Buscar Trámite',
+                        'descripcion' => 'Buscar trámite por CI del estudiante',
+                        'icono' => 'MagnifyingGlassIcon',
+                        'color' => 'blue',
+                        'ruta' => route('operador.tramites.buscar'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Trámites Pendientes',
+                        'descripcion' => 'Ver trámites pendientes de validación',
+                        'icono' => 'ClockIcon',
+                        'color' => 'orange',
+                        'ruta' => route('operador.tramites.pendientes'),
+                        'habilitado' => true,
+                        'badge' => $this->getTramitesPendientes(),
+                    ],
+                    [
+                        'titulo' => 'Digitalizar Expedientes',
+                        'descripcion' => 'Digitalizar documentos validados',
+                        'icono' => 'CloudArrowUpIcon',
+                        'color' => 'green',
+                        'ruta' => route('operador.tramites.validados'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Mi Historial',
+                        'descripcion' => 'Ver trámites que he procesado',
+                        'icono' => 'DocumentDuplicateIcon',
+                        'color' => 'purple',
+                        'ruta' => route('operador.historial'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Dashboard de Resultados',
+                        'descripcion' => 'Ver estadísticas y resultados generales',
+                        'icono' => 'ChartBarIcon',
+                        'color' => 'blue',
+                        'ruta' => route('admin.resultados.dashboard'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Gestionar Convocatorias',
+                        'descripcion' => 'Crear y administrar convocatorias',
+                        'icono' => 'MegaphoneIcon',
+                        'color' => 'green',
+                        'ruta' => route('admin.convocatorias.index'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Gestionar Becas',
+                        'descripcion' => 'Configurar becas y cupos',
+                        'icono' => 'AcademicCapIcon',
+                        'color' => 'purple',
+                        'ruta' => route('admin.becas.index'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Clasificación Automática',
+                        'descripcion' => 'Ejecutar clasificación de postulaciones',
+                        'icono' => 'CpuChipIcon',
+                        'color' => 'orange',
+                        'ruta' => route('admin.clasificacion.ejecutar'),
+                        'habilitado' => $this->hayTramitesListosParaClasificar(),
+                    ],
+                    [
+                        'titulo' => 'Exportar Reportes',
+                        'descripcion' => 'Generar reportes en Excel/PDF',
+                        'icono' => 'DocumentArrowDownIcon',
+                        'color' => 'indigo',
+                        'ruta' => route('admin.reportes.index'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Configuración',
+                        'descripcion' => 'Gestionar catálogos y parámetros',
+                        'icono' => 'Cog6ToothIcon',
+                        'color' => 'gray',
+                        'ruta' => route('admin.configuracion.index'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Dashboard Ejecutivo',
+                        'descripcion' => 'Ver KPIs y métricas principales',
+                        'icono' => 'PresentationChartLineIcon',
+                        'color' => 'blue',
+                        'ruta' => route('direccion.dashboard'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Resultados por Beca',
+                        'descripcion' => 'Ver rankings y aprobados',
+                        'icono' => 'TrophyIcon',
+                        'color' => 'yellow',
+                        'ruta' => route('admin.resultados.dashboard'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Análisis Comparativo',
+                        'descripcion' => 'Comparar convocatorias históricas',
+                        'icono' => 'ChartPieIcon',
+                        'color' => 'green',
+                        'ruta' => route('direccion.analisis'),
+                        'habilitado' => true,
+                    ],
+                    [
+                        'titulo' => 'Reportes Ejecutivos',
+                        'descripcion' => 'Descargar reportes consolidados',
+                        'icono' => 'DocumentChartBarIcon',
+                        'color' => 'purple',
+                        'ruta' => route('direccion.reportes'),
+                        'habilitado' => true,
+                    ],
+                ];
             case 'Dirección':
                 return [
                     [

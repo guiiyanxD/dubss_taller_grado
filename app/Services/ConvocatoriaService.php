@@ -23,7 +23,7 @@ class ConvocatoriaService
     public function getBecasByConvocatoria(int $convocatoriaId): Collection
     {
         $convocatoria = Convocatoria::with('becas:id,nombre')->find($convocatoriaId);
-
+        return dd($convocatoria);
         if (!$convocatoria) {
             return collect();
         }
@@ -55,7 +55,6 @@ class ConvocatoriaService
         }
 
         if (isset($filtros['busqueda'])) {
-            // Se usa 'nombre' ILIKE (para PostgreSQL) o LIKE (en MySQL/MariaDB)
             $query->where('nombre', 'ILIKE', '%' . $filtros['busqueda'] . '%');
         }
 
